@@ -9,21 +9,21 @@ REQ_PER_HOUR = 5_000
 RATE_LIMIT = ceil(REQ_PER_HOUR / 3_600) # seconds between requests, ceilinged for safety.
 
 Headers = {
-    "User-Agent": "Steve0Greatness"
+    "User-Agent": "mboxexport (github.com/steve0greatness/mboxexport)"
 }
 
 Patches = []
 
 def GetPRPatchURLs(owner: str, repo: str, pull: int) -> list[str]:
     PullAPICommits = PRCommits % { "owner": owner, "repo": repo, "pull": str(pull) }
-    CommitDicts = Get(PullAPICommits).json()
+    CommitDicts = Get(PullAPICommits, headers=Headers).json()
     return [
         PatchURL % { "owner": owner, "repo": repo, "commitsha": commit["sha"] }
         for commit in CommitDicts
     ]
 
 def QueryPatch(patchurl: str) -> bool:
-    PatchText = Get(patchurl).text
+    PatchText = Get(patchurl, headers=Headers).text
     Patches.append(PatchText)
     return True
 
